@@ -18,8 +18,9 @@ public class MainActivity extends AppCompatActivity {
             //opens or creates a database (so cool that it does both!)
             //name of the database, mode is about access (MODE_PRIVATE means only this app can access it)
             SQLiteDatabase myDatabase = this.openOrCreateDatabase("Pokemon", MODE_PRIVATE, null);
-            //create a table
-            myDatabase.execSQL("CREATE TABLE IF NOT EXISTS pokemon (name VARCHAR, number INT(3))");
+            //create a table (id part will automatically add id number counts)
+            //(for the pokemon example you would either want to add them all in order or better yet, make the number column the Primary key
+            myDatabase.execSQL("CREATE TABLE IF NOT EXISTS pokemon (name VARCHAR, number INT(3), id INTEGER PRIMARY KEY)");
 
             //put info int the table (notice the single quotes!)
             //each time the app is run this will be added again so in a real app move to a loop or something
@@ -27,10 +28,19 @@ public class MainActivity extends AppCompatActivity {
             myDatabase.execSQL("INSERT INTO pokemon (name, number) VALUES ('Nosepass', 299)");
 
             //pull info out of the database
-            Cursor c = myDatabase.rawQuery("SELECT * FROM pokemon", null);
+            //get only the OG/Kanto pokemon :) 
+            Cursor c = myDatabase.rawQuery("SELECT * FROM pokemon WHERE number <= 151", null);
+            //WHERE name = 'Nosepass' gets all pokemon named Nosepass
+            //WHERE name = 'Nosepass' AND number = 124 gets all pokemon named Nosepass with number 23 (none in this case)
+            //WHERE name LIKE 'S%' gets all pokemon that start with S
+            //name LIKE '%a%' gets all pokemon that have anything before and anything after an a in their name
+            //LIMIT 1 at the end limits the search to one result
+            //DELETE FROM pokemon WHERE name = 'Bulbasaur' deletes all pokemon named Bulbasaur
+
             //get the index
             int nameIndex = c.getColumnIndex("name");
             int numberIndex = c.getColumnIndex("number");
+            int idIndex = c.getColumnIndex("id");
             //put cursor to starting position of the table
             c.moveToFirst();
 
@@ -38,6 +48,7 @@ public class MainActivity extends AppCompatActivity {
             while (c != null) {
                 Log.i("name", c.getString(nameIndex));
                 Log.i("number", Integer.toString(c.getInt(numberIndex)));
+                Log.i("id", Integer.toString(c.getInt(idIndex)));
                 c.moveToNext();
             }
         } catch (Exception e) {
